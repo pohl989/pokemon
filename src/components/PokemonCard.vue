@@ -1,11 +1,17 @@
 <template lang="">
-  <div>
-    <div v-if="!isLoaded">...loading</div>
-    <div v-else>
-      <PokemonImg :name="name" :id="id" />
-      <h1>{{ englishName }}</h1>
-      <h3>{{ frenchName }}</h3>
-      <h3>{{ spanishName }}</h3>
+  <div class="poke-card">
+    <div v-if="!isLoaded" class="poke-card--body">...loading</div>
+    <div v-else class="poke-card--body">
+      <div class="poke-card--img">
+        <PokemonImg :name="name" :id="id" />
+      </div>
+      <div class="poke-card--content">
+        <h2 class="pokemon-title">{{ englishName }}</h2>
+
+        <h4 class="pokemon-subtitle">
+          {{ flavorText }}
+        </h4>
+      </div>
     </div>
   </div>
 </template>
@@ -13,6 +19,10 @@
 import { toRefs, defineComponent, ref, computed } from "vue";
 import { $http } from "@/axios-config";
 import PokemonImg from "../components/PokemonImg";
+
+const sample = (items) => {
+  return items[Math.floor(Math.random() * items.length)];
+};
 
 export default defineComponent({
   props: ["name", "url"],
@@ -38,9 +48,53 @@ export default defineComponent({
     };
     const spanishName = computed(() => getName(pokemon.value, "es"));
     const englishName = computed(() => getName(pokemon.value, "en"));
+    const getflavorTexts = function (pokemon, lang) {
+      return pokemon?.flavor_text_entries?.filter(
+        (c) => c.language.name === lang
+      );
+    };
     const frenchName = computed(() => getName(pokemon.value, "fr"));
-    return { id, isLoaded, spanishName, englishName, frenchName };
+    const flavorTexts = computed(() => getflavorTexts(pokemon.value, "en"));
+    const flavorText = computed(() => sample(flavorTexts.value)?.flavor_text);
+    return {
+      id,
+      isLoaded,
+      spanishName,
+      englishName,
+      frenchName,
+      pokemon,
+      flavorText,
+    };
   },
 });
 </script>
-<style lang=""></style>
+<style lang="scss">
+.poke-card {
+  margin: 5px;
+  padding: 10px;
+  background-color: #feca1c;
+  border: 3px solid #ef5350;
+  border-radius: 1rem;
+  display: flex;
+  justify-content: flex-start;
+  max-width: 400px;
+}
+
+.poke-card--body {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.poke-card--content {
+  text-align: left;
+}
+
+.pokemon-title {
+  margin: 0px;
+}
+.pokemon-subtitle {
+  margin: 0px;
+  font-style: italic;
+  font-weight: 300;
+}
+</style>

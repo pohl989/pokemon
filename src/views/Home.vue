@@ -21,9 +21,13 @@ export default {
   components: { PokemonCard },
   setup() {
     const pokemons = ref([]);
+    const offset = ref(20);
+    const limit = ref(20);
     const fetchPokemon = function () {
       $http
-        .get("/pokemon-species", { params: { offset: 690, limit: 30 } })
+        .get("/pokemon-species", {
+          params: { offset: offset.value, limit: limit.value },
+        })
         .then((res) => {
           pokemons.value = res?.data?.results;
         })
