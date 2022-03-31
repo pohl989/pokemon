@@ -8,17 +8,19 @@
         <PokemonImg :name="name" :id="id" />
       </div>
       <div class="poke-card--content">
-        <h2 class="pokemon-title">{{ englishName }}</h2>
+        <div class="header">
+          <h2 class="pokemon-title">{{ englishName }}</h2>
+          <div class="poke-labels">
+            <PokemonLabel
+              v-for="type in pokemonTypes"
+              :key="type.name"
+              :type="type"
+            />
+          </div>
+        </div>
         <h4 class="pokemon-subtitle">
           {{ flavorText }}
         </h4>
-        <div>
-          <PokemonLabel
-            v-for="type in pokemonTypes"
-            :key="type.name"
-            :type="type"
-          />
-        </div>
       </div>
     </div>
   </div>
@@ -100,6 +102,10 @@ export default defineComponent({
 });
 </script>
 <style lang="scss">
+.poke-labels {
+  margin-left: 1rem;
+}
+
 .poke-card {
   margin: 5px;
   padding: 10px;
@@ -127,5 +133,11 @@ export default defineComponent({
   margin: 0px;
   font-style: italic;
   font-weight: 300;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

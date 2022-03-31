@@ -1,6 +1,11 @@
 <template>
   <div class="home">
     <button @click="fetchPokemon">POKE</button>
+    <button @click="offset++">+</button>
+    <button @click="offset--">-</button>
+
+    {{ offset }}
+    {{ limit }}
     <PokemonCard
       v-for="pokemon in pokemons"
       :key="pokemon.name"
@@ -35,7 +40,7 @@ export default {
           alert("unable to load pokemon");
         });
     };
-    return { pokemons, fetchPokemon };
+    return { pokemons, fetchPokemon, offset, limit };
   },
 };
 </script>

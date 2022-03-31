@@ -26,17 +26,19 @@ export default {
 .pokemon-label {
   font-family: "Flexo-Medium", arial, sans-serif;
   border-radius: 3px;
-  line-height: 18px;
+  line-height: 16px;
   max-width: 110px;
-  margin: 0 1.5625% 0 0;
-  width: 38.4375%;
+  margin: 0 0.25rem 0 0;
+  width: 4rem;
   float: left;
   text-transform: none;
   font-size: 11px;
   text-align: center;
+  border: 1px solid #a4acaf;
 }
 
 .poke-type-normal {
+  border-color: #d7e2e6;
   background-color: #a4acaf;
   color: #212121;
 }
@@ -45,6 +47,7 @@ export default {
   color: #fff;
 }
 .poke-type-flying {
+  border-color: #d7e2e6;
   background: linear-gradient(180deg, #3dc7ef 50%, #bdb9b8 50%);
   background-color: #3dc7ef;
   color: #212121;
