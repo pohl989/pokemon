@@ -1,69 +1,100 @@
 <template lang="">
   <div class="poke-card">
-    <div v-if="!isLoaded" class="poke-card--body">...loading</div>
+    <div v-if="!isSpeciesLoaded && !isPokeLoaded" class="poke-card--body">
+      ...loading
+    </div>
     <div v-else class="poke-card--body">
       <div class="poke-card--img">
         <PokemonImg :name="name" :id="id" />
       </div>
       <div class="poke-card--content">
         <h2 class="pokemon-title">{{ englishName }}</h2>
-
         <h4 class="pokemon-subtitle">
           {{ flavorText }}
         </h4>
+        <div>
+          <PokemonLabel
+            v-for="type in pokemonTypes"
+            :key="type.name"
+            :type="type"
+          />
+        </div>
       </div>
     </div>
   </div>
 </template>
+
 <script>
-import { toRefs, defineComponent, ref, computed } from "vue";
+import { toRefs, defineComponent, ref, computed, reactive } from "vue";
 import { $http } from "@/axios-config";
 import PokemonImg from "../components/PokemonImg";
+import PokemonLabel from "../components/PokemonLabel";
 
-const sample = (items) => {
-  return items[Math.floor(Math.random() * items.length)];
+const getTypes = function (pokemon) {
+  return pokemon?.types;
 };
 
 export default defineComponent({
   props: ["name", "url"],
-  components: { PokemonImg },
+  components: { PokemonImg, PokemonLabel },
   setup(props) {
     const { name } = toRefs(props);
-    const isLoaded = ref(false);
+    const isPokeLoaded = ref(false);
+    const isSpeciesLoaded = ref(false);
     const id = ref(0);
-    const pokemon = ref({});
+
+    // pokemon types
+    const pokemon = reactive({});
+
     $http
-      .get(`/pokemon-species/${name.value}`)
+      .get(`/pokemon/${name.value}`)
       .then((res) => {
-        id.value = res?.data?.id;
         pokemon.value = res?.data;
       })
       .catch(() => {
         alert("something went wrong");
       })
-      .finally(() => (isLoaded.value = true));
+      .finally(() => (isPokeLoaded.value = true));
+
+    const pokemonTypes = computed(() => getTypes(pokemon.value));
+
+    // pokemon species fun descriptions aka flavor texts  && name
+    const pokemonSpecies = reactive({});
+    $http
+      .get(`/pokemon-species/${name.value}`)
+      .then((res) => {
+        id.value = res?.data?.id;
+        pokemonSpecies.value = res?.data;
+      })
+      .catch(() => {
+        alert("something went wrong");
+      })
+      .finally(() => (isSpeciesLoaded.value = true));
 
     const getName = function (pokemon, lang) {
       return pokemon?.names?.find((c) => c.language.name === lang)?.name;
     };
-    const spanishName = computed(() => getName(pokemon.value, "es"));
-    const englishName = computed(() => getName(pokemon.value, "en"));
-    const getflavorTexts = function (pokemon, lang) {
-      return pokemon?.flavor_text_entries?.filter(
-        (c) => c.language.name === lang
-      );
-    };
-    const frenchName = computed(() => getName(pokemon.value, "fr"));
-    const flavorTexts = computed(() => getflavorTexts(pokemon.value, "en"));
-    const flavorText = computed(() => sample(flavorTexts.value)?.flavor_text);
+    const englishName = computed(() => getName(pokemonSpecies.value, "en"));
+
+    const flavorTexts = computed(() => {
+      return pokemonSpecies?.value?.flavor_text_entries
+        ?.filter((c) => c.language.name === "en")
+        .map((c) => c.flavor_text);
+    });
+
+    const flavorText = computed(() => {
+      const arr = flavorTexts.value ?? [];
+      return arr[Math.floor(Math.random() * arr.length)];
+    });
     return {
       id,
-      isLoaded,
-      spanishName,
+      isPokeLoaded,
+      isSpeciesLoaded,
       englishName,
-      frenchName,
       pokemon,
       flavorText,
+      pokemonTypes,
+      pokemonSpecies,
     };
   },
 });

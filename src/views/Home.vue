@@ -21,7 +21,7 @@ export default {
   components: { PokemonCard },
   setup() {
     const pokemons = ref([]);
-    const offset = ref(20);
+    const offset = ref(10);
     const limit = ref(20);
     const fetchPokemon = function () {
       $http
